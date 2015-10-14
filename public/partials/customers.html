@@ -1,0 +1,38 @@
+<h1>Customers List</h1>
+<hr/>
+<a href="/add-edit-customer/0" class="btn btn-success pull-right">Add New Customer</a>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>VAT</th>
+            <th>E-mail</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr ng-repeat="customer in allCustomers">
+            <td>{{customer.name}}</td>
+            <td>{{customer.vat_number}}</td>
+            <td>{{customer.email}}</td>
+            <td><a ng-href="/add-edit-customer/{{customer.id}}">Edit</a></td>
+            <td><a ng-href="#" ng-click="deleteCustomer(customer.id)">Delete</a></td>
+        </tr>
+    </tbody>
+    <tfoot>
+        <td colspan="3">
+          <div class="pagination">
+            <ul>
+              <li ng-class="prevPageDisabled()">
+                <a href ng-click="prevPage()">« Prev</a>
+              </li>
+              <li ng-repeat="n in range()" ng-class="{active: n == currentPage}" ng-click="setPage(n)">
+                <a href="#">{{n+1}}</a>
+              </li>
+              <li ng-class="nextPageDisabled()">
+                <a href ng-click="nextPage()">Next »</a>
+              </li>
+            </ul>
+          </div>
+        </td>
+    </tfoot>
+</table>

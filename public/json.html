@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset='utf-8' />
+<link href='fullcalendar.min.css' rel='stylesheet' />
+<script src='lib/moment.min.js'></script>
+<script src='lib/jquery.min.js'></script>
+<script src='fullcalendar.min.js'></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+<script src="typeahead.min.js"></script>
+<link href='bootstrap.css' rel='stylesheet'/>
+
+<script>
+
+	$(document).ready(function() {
+		$('#calendar').fullCalendar({
+			header: {
+				left: 'prev,next today',
+				center: 'title',
+				right: 'month,agendaWeek,agendaDay'
+			},
+			defaultDate: '2015-02-12',
+			editable: true,
+			eventLimit: true, // allow "more" link when too many events
+			events: {
+				url: 'api/events',
+				error: function() {
+					$('#script-warning').show();
+				}
+			},
+			loading: function(bool) {
+				$('#loading').toggle(bool);
+			},
+			dayClick: function(date, jsEvent, view) {
+			  //$.post( "api/events/add", { title: "JSONTEST2", start: "2015-07-03"});
+			  $('#modalTitle').html(date.format());
+			  $('#start').val(date.format());
+			  $('#end').val(date.format());
+              $('#fullCalModal').modal();
+              //alert('Clicked on: ' + date.format());
+            },
+            eventClick: function(calEvent, jsEvent, view) {
+              $('#id').val(calEvent._id);
+              $('#title_edit').val(calEvent.title);
+              if(calEvent.start)
+			  	$('#start_edit').val(calEvent.start.format());
+			  if(calEvent.end)
+			  	$('#end_edit').val(calEvent.end.format());
+              $('#fullCalEdit').modal();	
+    		},
+    		eventRender: function(event, element) {
+    			//element.find(".fc-content").remove();
+    			//element.find(".fc-event-title").remove();
+    			//element.find(".fc-event-time").remove();
+
+    			element.append("<div class='close' id='delete'>×</div>");
+    		}
+		});
+	});
+
+</script>
+<script>
+	 	$(document).ready(function() {
+		    $('input.typeahead').typeahead({
+	        name: 'countries',
+	        prefetch: 'countries.json',
+	        limit: 10
+	    	});
+	    	$('#delete').click(function(){alert('click!');});
+	 	});
+</script>
+<style>
+
+	body {
+		margin: 0;
+		padding: 0;
+		font-family: "Lucida Grande",Helvetica,Arial,Verdana,sans-serif;
+		font-size: 14px;
+	}
+
+	#script-warning {
+		display: none;
+		background: #eee;
+		border-bottom: 1px solid #ddd;
+		padding: 0 10px;
+		line-height: 40px;
+		text-align: center;
+		font-weight: bold;
+		font-size: 12px;
+		color: red;
+	}
+
+	#loading {
+		display: none;
+		position: absolute;
+		top: 10px;
+		right: 10px;
+	}
+
+	#calendar {
+		max-width: 900px;
+		margin: 40px auto;
+		padding: 0 10px;
+	}
+
+</style>
+<style type="text/css">
+.bs-example{
+	font-family: sans-serif;
+	position: relative;
+	margin: 100px;
+}
+.typeahead, .tt-query, .tt-hint {
+	border: 2px solid #CCCCCC;
+	border-radius: 8px;
+	font-size: 24px;
+	height: 30px;
+	line-height: 30px;
+	outline: medium none;
+	padding: 8px 12px;
+	width: 396px;
+}
+.typeahead {
+	background-color: #FFFFFF;
+}
+.typeahead:focus {
+	border: 2px solid #0097CF;
+}
+.tt-query {
+	box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset;
+}
+.tt-hint {
+	color: #999999;
+}
+.tt-dropdown-menu {
+	background-color: #FFFFFF;
+	border: 1px solid rgba(0, 0, 0, 0.2);
+	border-radius: 8px;
+	box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+	margin-top: 12px;
+	padding: 8px 0;
+	width: 422px;
+}
+.tt-suggestion {
+	font-size: 24px;
+	line-height: 24px;
+	padding: 3px 20px;
+}
+.tt-suggestion.tt-is-under-cursor {
+	background-color: #0097CF;
+	color: #FFFFFF;
+}
+.tt-suggestion p {
+	margin: 0;
+}
+</style>
+</head>
+<body>
+	<!-- -------------- INSERT -------------------- -->
+	<div id="fullCalModal" class="modal fade">
+	    <div class="modal-dialog">
+	        <div class="modal-content">
+	            <div class="modal-header">
+	                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span> <span class="sr-only">close</span></button>
+	                <h4 id="modalTitle" class="modal-title"></h4>
+	            </div>
+	            <div id="modalBody" class="modal-body">
+	              <form action="api/events/add" id="insertForm">
+	            	<input type="text" name="title" placeholder="event title">
+	            	<input id="start" type="date" name="start" placeholder="start date">
+	            	<input id="end" type="date" name="end" placeholder="end date">
+	            	<input type="text" class="typeahead tt-query" autocomplete="off" spellcheck="false">
+	                <button class="btn btn-primary" type="submit">Submit</button>
+	              </form>
+	            </div>
+	            <div class="modal-footer">
+	                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+	            </div>
+	        </div>
+	    </div>
+	</div>
+	<script>
+		// Attach a submit handler to the form
+        $("#insertForm").submit(function( event ) {
+	    	// Stop form from submitting normally
+	    	event.preventDefault();
+	 
+	    	// Get some values from elements on the page:
+	  		var $form = $(this),
+	    	title = $form.find("input[name='title']").val(),
+	    	start = $form.find("input[name='start']").val(),
+	    	end = $form.find("input[name='end']").val(),
+	    	url = $form.attr("action");
+	 
+	 		
+	  		// Send the data using post
+	  		var posting = $.post( url, {"title": title, "start": start, "end":end } );
+	  		
+	  		posting.done(function( data ) {
+	    	  $('#calendar').fullCalendar('refetchEvents');
+	  		  $('#fullCalModal').modal("hide");
+	  		});
+		});
+	</script>
+	
+	<!-- -------------- EDIT -------------------- -->
+	<div id="fullCalEdit" class="modal fade">
+	    <div class="modal-dialog">
+	        <div class="modal-content">
+	            <div class="modal-header">
+	                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span> <span class="sr-only">close</span></button>
+	                <h4 id="modalTitle_edit" class="modal-title"></h4>
+	            </div>
+	            <div id="modalBody" class="modal-body">
+	              <form action="api/events/update" id="editForm">
+	              	<input type="hidden" name="id" id="id">
+	            	<input id="title_edit" type="text" name="title" >
+	            	<input id="start_edit" type="date" name="start">
+	            	<input id="end_edit" type="date" name="end">
+	                <button class="btn btn-primary" type="submit">Submit</button>
+	              </form>
+	            </div>
+	            <div class="modal-footer">
+	                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+	            </div>
+	        </div>
+	    </div>
+	</div>
+	<script>
+	// Attach a submit handler to the form
+    $("#editForm").submit(function( event ) {
+    	// Stop form from submitting normally
+    	event.preventDefault();
+ 
+    	// Get some values from elements on the page:
+  		var $form = $(this),
+    	title = $form.find("input[name='title']").val(),
+    	start = $form.find("input[name='start']").val(),
+    	end = $form.find("input[name='end']").val(),
+    	url = $form.attr("action");
+ 
+ 		
+  		// Send the data using post
+  		var posting = $.post( url, {"_id":$form.find("input[name='id']").val(),"title": title, "start": start, "end":end } );
+  		
+  		posting.done(function( data ) {
+    	  $('#calendar').fullCalendar('refetchEvents');
+  		  $('#fullCalEdit').modal("hide");
+  		});
+	});
+	</script>
+
+	<div id='loading'>loading...</div>
+
+	<div id='calendar'></div>
+
+</body>
+</html>

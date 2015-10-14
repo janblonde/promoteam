@@ -1,0 +1,23 @@
+<h1>{{heading}}</h1>
+<hr/>
+<form role="form" id="add-customer" ng-submit="saveCustomer()">
+    <div class="form-group">
+        <label>Customer ID</label>
+        <input class="form-control" type="text" readonly ng-model="customer.id" />
+    </div>
+    <div class="form-group">
+        <label>Name</label>
+        <input class="form-control" type="text" ng-model="customer.name" />
+    </div>
+    <div class="form-group">
+        <label>VAT Number</label>
+        <input class="form-control" type="text" ng-model="customer.vat_number" />
+    </div>
+    <div class="form-group">
+        <label>E-mail</label>
+        <input class="form-control" type="text" ng-model="customer.email" />
+    </div>
+    <input type="submit" class="btn btn-success" value="Save">
+    </div>
+</form>
+
